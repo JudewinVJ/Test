@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  web:
+    image: nginx-reverse-proxy:latest
+    ports:
+      - "8000:80"
+    depends_on:
+      - country
+      - airport
+    networks:
+      - country-net
+      - airport-net
+  jenkins:
+    image: jenkins
+    volumes: 
+      - jenkins:/var/jenkins_home
+    ports:
+      - "8080:8080"
+    networks:
+      - country-net
+      - airport-net
+  country:
+    image: testaxiom/countries-assembly:1.0.1
+    networks:
+      - country-net
+  airport:
+    image: testaxiom/airports-assembly:1.0.1
+    networks:
+      - airport-net
+
+networks:
+  country-net:
+    driver: overlay
+  airport-net:
+    driver: overlay
+
+volumes:
+  jenkins:
+    external: true
